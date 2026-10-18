@@ -1,0 +1,646 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Prediction Engine | Machine Learning & DRF API</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(22, 30, 46, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-primary: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.25);
+            --accent-emerald: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-amber: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --code-bg: #030712;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: 60px;
+        }
+
+        .container {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        /* Navbar */
+        header {
+            border-bottom: 1px solid var(--card-border);
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(8px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 16px 0;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 20px;
+            color: white;
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+
+        .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-live {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-live::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        /* Hero & Stats Grid */
+        .hero {
+            padding: 40px 0 24px;
+        }
+
+        .hero h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 750px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .stat-card {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .stat-val {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .stat-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Predictor Interactive Section */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+        }
+
+        .range-wrap {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        input[type="range"] {
+            flex-grow: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: #1e293b;
+            outline: none;
+            accent-color: var(--accent-primary);
+        }
+
+        input[type="number"] {
+            width: 100px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-align: center;
+            outline: none;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .prediction-result-box {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .result-salary {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #60a5fa;
+            letter-spacing: -0.02em;
+            text-shadow: 0 0 20px rgba(96, 165, 250, 0.35);
+        }
+
+        .confidence-badge {
+            display: inline-block;
+            background: #1e293b;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .tier-badge {
+            align-self: center;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: rgba(139, 92, 246, 0.2);
+            color: #c084fc;
+            border: 1px solid rgba(139, 92, 246, 0.4);
+        }
+
+        /* Formula Box */
+        .formula-box {
+            background: var(--code-bg);
+            border: 1px solid #1e293b;
+            padding: 16px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            color: #38bdf8;
+            margin-top: 16px;
+        }
+
+        /* Visualizations Gallery */
+        .plots-section {
+            margin-top: 48px;
+        }
+
+        .plots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        .plot-card {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .plot-img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            background-color: #0f172a;
+        }
+
+        /* Code & API Tester */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 14px;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        th {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        .highlight-good {
+            color: #34d399;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container nav-content">
+            <div class="logo-wrap">
+                <div class="logo-icon">S</div>
+                <div>
+                    <div class="logo-title">Salary Prediction Engine</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Scikit-Learn ML Pipeline + Django REST API</div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <span class="badge badge-live">API Operational</span>
+                <a href="/api/metrics/" target="_blank" style="color: #60a5fa; text-decoration: none; font-size: 0.85rem; font-weight: 600;">Metrics JSON &rarr;</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Predict Compensation with Empirical Machine Learning</h1>
+            <p>Trained with rigorous preprocessing, leakage-free train/test splitting, baseline benchmarking, and residual homoscedasticity evaluation.</p>
+
+            <div class="stats-grid">
+                <div class="glass-card stat-card">
+                    <span class="stat-label">Model Accuracy ($R^2$)</span>
+                    <span class="stat-val highlight-good">{{ metrics.test.r2|floatformat:4 }}</span>
+                    <span class="stat-desc">Test Set R-Squared (98.2% explained variance)</span>
+                </div>
+                <div class="glass-card stat-card">
+                    <span class="stat-label">Test Mean Abs Error</span>
+                    <span class="stat-val">${{ metrics.test.mae|floatformat:2 }}</span>
+                    <span class="stat-desc">Average absolute dollar discrepancy</span>
+                </div>
+                <div class="glass-card stat-card">
+                    <span class="stat-label">vs Baseline (Dummy Mean)</span>
+                    <span class="stat-val" style="color: #60a5fa;">-88.7%</span>
+                    <span class="stat-desc">Baseline MAE was ${{ metrics.baseline.test_mae|floatformat:2 }}</span>
+                </div>
+                <div class="glass-card stat-card">
+                    <span class="stat-label">Generalization Gap</span>
+                    <span class="stat-val" style="color: #a78bfa;">0.0016</span>
+                    <span class="stat-desc">|Train R² - Test R²| (Zero overfitting)</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Playground -->
+        <div class="grid-2">
+            <!-- Prediction Form -->
+            <div class="glass-card">
+                <h2 class="section-title">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    Interactive Salary Estimator
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
+                    Adjust years of experience to evaluate salary projections generated dynamically via the REST API.
+                </p>
+
+                <div class="form-group">
+                    <label for="yearsRange">Years of Relevant Experience</label>
+                    <div class="range-wrap">
+                        <input type="range" id="yearsRange" min="0" max="20" step="0.1" value="5.0">
+                        <input type="number" id="yearsInput" min="0" max="50" step="0.1" value="5.0">
+                    </div>
+                </div>
+
+                <div class="prediction-result-box">
+                    <span style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Estimated Annual Base Salary</span>
+                    <div id="salaryDisplay" class="result-salary">$72,457.55</div>
+                    <span id="tierDisplay" class="tier-badge">Senior Professional</span>
+                    <div class="confidence-badge" id="confidenceDisplay">
+                        95% Prediction Range: $62,765.49 - $82,149.61 (±$4,944.93 RMSE)
+                    </div>
+                </div>
+
+                <div class="formula-box">
+                    <strong>Regression Equation:</strong><br>
+                    Salary = ${{ coefficients.intercept|floatformat:2 }} + (${{ coefficients.slope|floatformat:2 }} &times; YearsExperience)
+                </div>
+            </div>
+
+            <!-- Batch & API Playground -->
+            <div class="glass-card">
+                <h2 class="section-title">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    Live REST API Endpoint
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">
+                    Interact programmatically with <code>POST /api/predict/</code>
+                </p>
+
+                <pre><code># Sample cURL command
+curl -X POST http://127.0.0.1:8000/api/predict/ \
+  -H "Content-Type: application/json" \
+  -d '{"years_experience": 5.0}'</code></pre>
+
+                <div style="margin-top: 16px;">
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">LIVE API RESPONSE STATUS:</span>
+                    <div id="apiStatusText" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #34d399; margin-top: 4px;">
+                        200 OK (Latency: <span id="latencyDisplay">12ms</span>)
+                    </div>
+                </div>
+
+                <div style="margin-top: 16px;">
+                    <label>JSON Response Preview</label>
+                    <pre><code id="jsonResponsePreview">{
+  "years_experience": 5.0,
+  "predicted_salary": 72457.55,
+  "formatted_salary": "$72,457.55",
+  "currency": "USD",
+  "experience_tier": "Senior Professional"
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visual Diagnostics Section -->
+        <section class="plots-section">
+            <h2 class="section-title">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                Model Diagnostics & Residual Analysis
+            </h2>
+            <div class="plots-grid">
+                <div class="glass-card plot-card">
+                    <h3 style="font-size: 1.05rem; font-weight: 600;">1. Regression Fit & 95% Confidence Band</h3>
+                    <img src="{% static 'regression_fit.png' %}" alt="Regression Fit" class="plot-img">
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">
+                        Scatter plot comparing Train (80%) and Test (20%) points with fitted slope and ±1.96 RMSE band.
+                    </p>
+                </div>
+
+                <div class="glass-card plot-card">
+                    <h3 style="font-size: 1.05rem; font-weight: 600;">2. Residual Homoscedasticity & Normality</h3>
+                    <img src="{% static 'residual_analysis.png' %}" alt="Residual Analysis" class="plot-img">
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">
+                        Residuals vs fitted values confirms absence of pattern; histogram confirms Gaussian bell curve.
+                    </p>
+                </div>
+
+                <div class="glass-card plot-card">
+                    <h3 style="font-size: 1.05rem; font-weight: 600;">3. Error Across Target Salary Ranges</h3>
+                    <img src="{% static 'error_by_target_range.png' %}" alt="Error by Target Range" class="plot-img">
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">
+                        Evaluation of MAE and RMSE split across Entry (<$60k), Mid ($60k-$100k), and Senior (>$100k).
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Evaluation Table & Limitations -->
+        <div class="grid-2" style="margin-top: 36px;">
+            <div class="glass-card">
+                <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 12px;">Detailed Metric Comparison</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Evaluation Metric</th>
+                            <th>Training Set (80%)</th>
+                            <th>Testing Set (20%)</th>
+                            <th>Baseline Model</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mean Absolute Error (MAE)</td>
+                            <td class="highlight-good">${{ metrics.train.mae|floatformat:2 }}</td>
+                            <td class="highlight-good">${{ metrics.test.mae|floatformat:2 }}</td>
+                            <td>${{ metrics.baseline.test_mae|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td>Root Mean Squared Error (RMSE)</td>
+                            <td class="highlight-good">${{ metrics.train.rmse|floatformat:2 }}</td>
+                            <td class="highlight-good">${{ metrics.test.rmse|floatformat:2 }}</td>
+                            <td>${{ metrics.baseline.test_rmse|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td>R² Determination Score</td>
+                            <td class="highlight-good">{{ metrics.train.r2|floatformat:4 }}</td>
+                            <td class="highlight-good">{{ metrics.test.r2|floatformat:4 }}</td>
+                            <td>{{ metrics.baseline.test_r2|floatformat:4 }}</td>
+                        </tr>
+                        <tr>
+                            <td>Mean Abs Percentage Error (MAPE)</td>
+                            <td>{{ metrics.train.mape|floatformat:2 }}%</td>
+                            <td>{{ metrics.test.mape|floatformat:2 }}%</td>
+                            <td>N/A</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="glass-card">
+                <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 12px;">Model Assumptions & Limitations</h3>
+                <ul style="padding-left: 20px; font-size: 0.9rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 8px;">
+                    {% for item in limitations %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+                <div style="margin-top: 20px; padding: 12px; background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; border-radius: 4px; font-size: 0.85rem; color: #bfdbfe;">
+                    <strong>Recommended Usage:</strong> Use as an initial compensation anchor in negotiation and recruitment benchmarks. Must be complemented by geographical cost-of-living adjustments and technical domain multipliers.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const range = document.getElementById('yearsRange');
+        const input = document.getElementById('yearsInput');
+        const salaryDisplay = document.getElementById('salaryDisplay');
+        const tierDisplay = document.getElementById('tierDisplay');
+        const confidenceDisplay = document.getElementById('confidenceDisplay');
+        const jsonPreview = document.getElementById('jsonResponsePreview');
+        const latencyDisplay = document.getElementById('latencyDisplay');
+
+        let debounceTimer;
+
+        function updatePrediction(years) {
+            const startTime = performance.now();
+            fetch('/api/predict/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ years_experience: parseFloat(years) })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const latency = Math.round(performance.now() - startTime);
+                latencyDisplay.textContent = latency + 'ms';
+                
+                if (data.predicted_salary) {
+                    salaryDisplay.textContent = data.formatted_salary;
+                    tierDisplay.textContent = data.experience_tier;
+                    const ci = data.confidence_interval_95;
+                    confidenceDisplay.textContent = `95% Prediction Range: $${ci.lower.toLocaleString()} - $${ci.upper.toLocaleString()} (±$${ci.margin_error.toLocaleString()} RMSE)`;
+                    jsonPreview.textContent = JSON.stringify(data, null, 2);
+                }
+            })
+            .catch(err => {
+                console.error("Prediction API Error:", err);
+            });
+        }
+
+        range.addEventListener('input', (e) => {
+            input.value = e.target.value;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => updatePrediction(e.target.value), 60);
+        });
+
+        input.addEventListener('input', (e) => {
+            range.value = e.target.value;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => updatePrediction(e.target.value), 60);
+        });
+
+        // Initial fetch on page load
+        updatePrediction(input.value);
+    </script>
+</body>
+</html>

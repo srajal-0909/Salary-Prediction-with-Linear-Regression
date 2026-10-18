@@ -1,0 +1,48 @@
+{
+    "model_name": "Linear Regression Salary Predictor",
+    "created_at": "2026-10-18T09:09:13.696370",
+    "framework": "scikit-learn",
+    "features": [
+        "YearsExperience"
+    ],
+    "target": "Salary",
+    "coefficients": {
+        "intercept": 25553.02830182328,
+        "slope": 9380.904998832708
+    },
+    "dataset_statistics": {
+        "total_samples": 100,
+        "train_samples": 80,
+        "test_samples": 20,
+        "years_min": 0.8,
+        "years_max": 14.8,
+        "salary_min": 26211.0,
+        "salary_max": 166633.0
+    },
+    "performance_metrics": {
+        "train": {
+            "mae": 3940.4787133563887,
+            "rmse": 5050.153730918961,
+            "r2": 0.9831791114584548,
+            "mape": 5.74738536129781
+        },
+        "test": {
+            "mae": 3969.3075802406893,
+            "rmse": 4944.930997506122,
+            "r2": 0.9816316737622441,
+            "mape": 5.961798282823475
+        },
+        "baseline": {
+            "strategy": "Mean Dummy Regressor",
+            "test_mae": 35005.463749999995,
+            "test_rmse": 37809.20072801601,
+            "test_r2": -0.07385119811910101
+        }
+    },
+    "limitations": [
+        "Assumes a strictly linear relationship between experience and salary.",
+        "Does not account for job role, tech stack, education degree, or geographical cost-of-living adjustments.",
+        "Extrapolation risk: predictions for experience < 0.5 years or > 20 years carry increased uncertainty.",
+        "Does not account for economic inflation or dynamic market compensation shifts over time."
+    ]
+}
